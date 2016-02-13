@@ -23,7 +23,7 @@ var HTMLgithub = '<li class="flex-item"><span class="orange-text">github</span><
 var HTMLblog = '<li class="flex-item"><span class="orange-text">blog</span><span class="white-text">%data%</span></li>';
 var HTMLlocation = '<li class="flex-item"><span class="orange-text">location</span><span class="white-text">%data%</span></li>';
 
-var HTMLbioPic = '<img src="%data%" class="biopic">';
+var HTMLbioPic = '<div><img src="%data%" class="biopic">';
 var HTMLwelcomeMsg = '<span class="welcome-message">%data%</span>';
 
 var HTMLskillsStart = '<h3 id="skills-h3">Skills at a Glance:</h3><ul id="skills" class="flex-box"></ul>';
@@ -44,17 +44,18 @@ var HTMLprojectImage = '<img src="%data%">';
 
 var HTMLschoolStart = '<div class="education-entry"></div>';
 var HTMLschoolName = '<a href="#">%data%';
-var HTMLschoolDegree = ' -- %data%</a>';
+var HTMLschoolDegree = ' - %data%</a>';
 var HTMLschoolDates = '<div class="date-text">%data%</div>';
 var HTMLschoolLocation = '<div class="location-text">%data%</div>';
 var HTMLschoolMajor = '<em><br>Major: %data%</em>';
 
 var HTMLonlineClasses = '<h3>Online Classes</h3>';
 var HTMLonlineTitle = '<a href="#">%data%';
-var HTMLonlineSchool = ' - %data%</a>';
+//var HTMLonlineDegree = '<div class="degree-text">%data%</div>';
+var HTMLonlineDegree = ' - %data%</a>';
 var HTMLonlineDates = '<div class="date-text">%data%</div>';
-var HTMLonlineURL = '<br><a href="#">%data%</a>';
-
+var HTMLonlineURL = '<a class="course-anchor" href="#">%data%</a>';
+var HTMLonlineCourseList = '<em><br>Courses:</em><ul id="onlineClass" class="flex-box" text-Align = "left"></ul>';
 var internationalizeButton = '<button>Internationalize</button>';
 var googleMap = '<div id="map"></div>';
 
@@ -85,7 +86,7 @@ function logClicks(x,y) {
 }
 
 $(document).click(function(loc) {
-  // your code goes here!
+  logClicks(loc.pageX,loc.pageY);
 });
 
 
@@ -96,7 +97,6 @@ See the documentation below for more details.
 https://developers.google.com/maps/documentation/javascript/reference
 */
 var map;    // declares a global map variable
-
 
 /*
 Start here! initializeMap() is called when page is loaded.
@@ -176,8 +176,49 @@ function initializeMap() {
 
     // hmmmm, I wonder what this is about...
     google.maps.event.addListener(marker, 'click', function() {
+	//	overlay = new locationOverlay(bounds, overlayMaps[marker.getTitle()], map);
+		
+		map.setZoom(8);
+        map.setCenter(marker.getPosition());
       // your code goes here!
     });
+	
+     // this is where the pin actually gets added to the map.
+    // bounds.extend() takes in a map location object
+    bounds.extend(new google.maps.LatLng(lat, lon));
+    // fit the map to the new marker
+    map.fitBounds(bounds);
+    // center the map
+    map.setCenter(bounds.getCenter());
+  }
+ 
+   /*
+  callback(results, status) makes sure the search returned results for a location.
+  If so, it creates a new map marker for that location.
+  */
+  function callback(results, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+      createMapMarker(results[0]);
+    }
+  }
+
+/*	locationOverlay.prototype = new google.maps.OverlayView();
+	
+	function locationOverlay(bounds, image, map) {
+
+	// Now initialize all properties.
+	this.bounds_ = bounds;
+	this.image_ = image;
+	this.map_ = map;
+
+	// Define a property to hold the image's div. We'll
+	// actually create this div upon receipt of the onAdd()
+	// method so we'll leave it null for now.
+	this.div_ = null;
+
+	// Explicitly call setMap on this overlay
+	this.setMap(map);
+	}
 
     // this is where the pin actually gets added to the map.
     // bounds.extend() takes in a map location object
@@ -187,16 +228,27 @@ function initializeMap() {
     // center the map
     map.setCenter(bounds.getCenter());
   }
+  
+  /*locationOverlay.prototype.draw = function() {
 
-  /*
-  callback(results, status) makes sure the search returned results for a location.
-  If so, it creates a new map marker for that location.
-  */
-  function callback(results, status) {
-    if (status == google.maps.places.PlacesServiceStatus.OK) {
-      createMapMarker(results[0]);
-    }
-  }
+  // We use the south-west and north-east
+  // coordinates of the overlay to peg it to the correct position and size.
+  // To do this, we need to retrieve the projection from the overlay.
+  var overlayProjection = this.getProjection();
+
+  // Retrieve the south-west and north-east coordinates of this overlay
+  // in LatLngs and convert them to pixel coordinates.
+  // We'll use these coordinates to resize the div.
+  var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+  var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+
+  // Resize the image's div to fit the indicated dimensions.
+  var div = this.div_;
+  div.style.left = sw.x + 'px';
+  div.style.top = ne.y + 'px';
+  div.style.width = (ne.x - sw.x) + 'px';
+  div.style.height = (sw.y - ne.y) + 'px';
+};
 
   /*
   pinPoster(locations) takes in the array of locations created by locationFinder()
@@ -238,11 +290,11 @@ Uncomment the code below when you're ready to implement a Google Map!
 */
 
 // Calls the initializeMap() function when the page loads
-//window.addEventListener('load', initializeMap);
+window.addEventListener('load', initializeMap);
 
 // Vanilla JS way to listen for resizing of the window
 // and adjust map bounds
-//window.addEventListener('resize', function(e) {
+  window.addEventListener('resize', function(e) {
   //Make sure the map bounds get updated on page resize
-//  map.fitBounds(mapBounds);
-//});
+  map.fitBounds(mapBounds);
+});
