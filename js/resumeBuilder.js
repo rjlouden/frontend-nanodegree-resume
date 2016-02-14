@@ -9,7 +9,7 @@ This is empty on purpose! Your code to build the resume will go here.
 		"mobile": "704-555-1212",
 		"email":"rjlouden@uncc.edu",
 		"github":"rjlouden",
-		"location":"Charlotte, NC"
+		"location":"New York, NY"
 	},
 	"bioPic":"./images/mountain-flowers-400x300.jpg",
 	"skills": ["ldap", "powershell", "python","file sharing"],
@@ -204,7 +204,8 @@ var onlineEducation = {
 
 var locationImages = [];
 locationImages["Greensboro, NC, USA"]="./images/Greensboro.jpg";
-locationImages["Charlotte, NC, USA"]="./images/Charlotte_Skyline_Night_970x550.jpg";		
+locationImages["Charlotte, NC, USA"]="./images/Charlotte_Skyline_Night_970x550.jpg";
+locationImages["New York, NY, USA"]="./images/statue.jpg";
  
 function inName(){
 	var names = bio.name.trim().split(" ");

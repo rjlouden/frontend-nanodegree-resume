@@ -182,18 +182,20 @@ function initializeMap() {
 //	map.setCenter(marker.getPosition());
 //	map.setZoom(8.0);
     if (overlayMaps[name] == undefined) {
-		overlayMaps[name] = new locationOverlay(bounds, locationImages[name], map);
+		if (locationImages[name]!= undefined){
+			overlayMaps[name] = new locationOverlay(bounds, locationImages[name], map);
+		}
 	}
 	for (var loc in overlayMaps){
 		if (loc !== name ) {
 			overlayMaps[loc].div_.style.visibility = 'hidden';
 		}
-		else if (overlayMaps[loc].div_ !== null) {
+		else if (overlayMaps[name] != undefined && overlayMaps[loc].div_ !== null) {
 			overlayMaps[loc].div_.style.visibility = 'visible';
 		}
 	}
     
-	//infoWindow.open(map, marker)
+	infoWindow.open(map, marker)
     });
 	
      // this is where the pin actually gets added to the map.
