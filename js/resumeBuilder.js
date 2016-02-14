@@ -167,9 +167,9 @@ var onlineEducation = {
 		}
 };
 
-var overlayMaps = [];
-overlayMaps["Greensboro, NC, USA"]="./images/Greensboro.jpg";
-overlayMaps["Charlotte, NC, USA"]="./images/Charlotte_Skyline_Night_970x550.jpg";		
+var locationImages = [];
+locationImages["Greensboro, NC, USA"]="./images/Greensboro.jpg";
+locationImages["Charlotte, NC, USA"]="./images/Charlotte_Skyline_Night_970x550.jpg";		
 
 function displayNameAndContacts(){
 	var formattedName = HTMLheaderName.replace("%data%",bio.name);
@@ -216,7 +216,7 @@ work.display();
 projects.display();
 education.display();
 onlineEducation.display();
-//$("#header").append('<div><img src="./images/Charlotte_Skyline_Night_970x550.jpg" class="biopic">');
+
 $("#mapDiv").append(googleMap);
 
  

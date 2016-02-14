@@ -97,6 +97,8 @@ See the documentation below for more details.
 https://developers.google.com/maps/documentation/javascript/reference
 */
 var map;    // declares a global map variable
+var overlayMaps =[];
+locationOverlay.prototype = new google.maps.OverlayView();
 
 /*
 Start here! initializeMap() is called when page is loaded.
@@ -107,6 +109,8 @@ function initializeMap() {
 
   var mapOptions = {
     disableDefaultUI: true
+//	mapTypeId: google.maps.MapTypeId.SATELLITE,
+//	center: new google.maps.LatLng(40.743388, -74.007592),
   };
 
   /* 
@@ -114,8 +118,7 @@ function initializeMap() {
   appended to #mapDiv in resumeBuilder.js. 
   */
   map = new google.maps.Map(document.querySelector('#map'), mapOptions);
-
-
+    
   /*
   locationFinder() returns an array of every location string from the JSONs
   written for bio, education, and work.
@@ -174,13 +177,23 @@ function initializeMap() {
       content: name
     });
 
-    // hmmmm, I wonder what this is about...
     google.maps.event.addListener(marker, 'click', function() {
-	//	overlay = new locationOverlay(bounds, overlayMaps[marker.getTitle()], map);
-		
-		map.setZoom(8);
-        map.setCenter(marker.getPosition());
-      // your code goes here!
+			
+//	map.setCenter(marker.getPosition());
+//	map.setZoom(8.0);
+    if (overlayMaps[name] == undefined) {
+		overlayMaps[name] = new locationOverlay(bounds, locationImages[name], map);
+	}
+	for (var loc in overlayMaps){
+		if (loc !== name ) {
+			overlayMaps[loc].div_.style.visibility = 'hidden';
+		}
+		else if (overlayMaps[loc].div_ !== null) {
+			overlayMaps[loc].div_.style.visibility = 'visible';
+		}
+	}
+    
+	//infoWindow.open(map, marker)
     });
 	
      // this is where the pin actually gets added to the map.
@@ -202,53 +215,6 @@ function initializeMap() {
     }
   }
 
-/*	locationOverlay.prototype = new google.maps.OverlayView();
-	
-	function locationOverlay(bounds, image, map) {
-
-	// Now initialize all properties.
-	this.bounds_ = bounds;
-	this.image_ = image;
-	this.map_ = map;
-
-	// Define a property to hold the image's div. We'll
-	// actually create this div upon receipt of the onAdd()
-	// method so we'll leave it null for now.
-	this.div_ = null;
-
-	// Explicitly call setMap on this overlay
-	this.setMap(map);
-	}
-
-    // this is where the pin actually gets added to the map.
-    // bounds.extend() takes in a map location object
-    bounds.extend(new google.maps.LatLng(lat, lon));
-    // fit the map to the new marker
-    map.fitBounds(bounds);
-    // center the map
-    map.setCenter(bounds.getCenter());
-  }
-  
-  /*locationOverlay.prototype.draw = function() {
-
-  // We use the south-west and north-east
-  // coordinates of the overlay to peg it to the correct position and size.
-  // To do this, we need to retrieve the projection from the overlay.
-  var overlayProjection = this.getProjection();
-
-  // Retrieve the south-west and north-east coordinates of this overlay
-  // in LatLngs and convert them to pixel coordinates.
-  // We'll use these coordinates to resize the div.
-  var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
-  var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
-
-  // Resize the image's div to fit the indicated dimensions.
-  var div = this.div_;
-  div.style.left = sw.x + 'px';
-  div.style.top = ne.y + 'px';
-  div.style.width = (ne.x - sw.x) + 'px';
-  div.style.height = (sw.y - ne.y) + 'px';
-};
 
   /*
   pinPoster(locations) takes in the array of locations created by locationFinder()
@@ -285,9 +251,57 @@ function initializeMap() {
 
 }
 
-/*
-Uncomment the code below when you're ready to implement a Google Map!
-*/
+function locationOverlay(bounds, image, map) {
+        this.bounds_ = bounds;
+        this.image_ = image;
+        this.map_ = map;
+        this.div_ = null;
+        this.setMap(map);
+    }
+
+locationOverlay.prototype.onAdd = function () {
+        var div = document.createElement('div');
+        div.style.borderStyle = 'none';
+        div.style.borderWidth = '0px';
+        div.style.position = 'absolute';
+
+        var img = document.createElement('img');
+        img.src = this.image_;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.opacity = '0.5';
+        img.style.position = 'absolute';
+        div.appendChild(img);
+        this.div_ = div;
+
+        var panes = this.getPanes();
+        panes.overlayLayer.appendChild(div);
+    };
+
+    locationOverlay.prototype.draw = function () {
+        var overlayProjection = this.getProjection();
+        var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+        var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+        var div = this.div_;
+
+        div.style.left = sw.x + 'px';
+        div.style.top = ne.y + 'px';
+        div.style.width = (ne.x - sw.x) + 'px';
+        div.style.height = (sw.y - ne.y) + 'px';
+    };
+
+
+// The onRemove() method will be called automatically from the API if
+// we ever set the overlay's map property to 'null'.
+locationOverlay.prototype.updateBounds = function (bounds) {
+        this.bounds_ = bounds;
+        this.draw();
+    };
+
+    locationOverlay.prototype.onRemove = function () {
+        this.div_.parentNode.removeChild(this.div_);
+        this.div_ = null;
+    };
 
 // Calls the initializeMap() function when the page loads
 window.addEventListener('load', initializeMap);
