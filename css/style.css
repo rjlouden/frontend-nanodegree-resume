@@ -79,6 +79,12 @@ h5 {
 
 }
 
+.course-anchor {
+  display: list;
+  float: left;
+  margin-top: 0px;
+}
+
 p {
   font-size: 14px;
   color: #333;
