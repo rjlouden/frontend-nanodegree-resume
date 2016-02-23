@@ -42,10 +42,16 @@ h2 {
 }
 
 h3 {
-  font-style: italic;
+ /* font-style: italic;*/
   font-size: 20px;
-  color: #000;
+ /* color: #000;*/
+  color: #444E8C;
   line-height: 22px;
+}
+
+em {
+	font-style: normal;
+	color: #444E8C;
 }
 
 h4 {

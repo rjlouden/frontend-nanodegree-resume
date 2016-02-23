@@ -167,14 +167,17 @@ var viewBio = {
 
 var viewWork ={
 	start : '<div class="work-entry"></div>',
-	employer : '<a href="#">%data%',
+	employer : '<a href="#" target="_blank">%data%',
 	title : ' - %data%</a>',
 	dates : '<div class="date-text">%data%</div>',
 	location : '<div class="location-text">%data%</div>',
 	description : '<p><br>%data%</p>',
 	render : function (){
 		myJobs = octopus.getJobs();
-		if(myJobs.length === 0) {return;}
+		if(myJobs.length === 0) {
+			document.getElementById('workExperience').style.display = 'none';
+			return;
+		}
 		
 		for (var job in myJobs){
 			
@@ -193,13 +196,14 @@ var viewWork ={
 
 var viewEducation = {
 	start : '<div class="education-entry"></div>',
-	name : '<a href="#">%data%',
+	name : '<a href="#" target="_blank">%data%',
 	degree : ' - %data%</a>',
 	dates : '<div class="date-text">%data%</div>',
 	location : '<div class="location-text">%data%</div>',
 	major : '<em><br>Major: %data%</em>',
 	"render": function(){
 		mySchools = octopus.getSchools();
+		
 		for (var s in mySchools){
 			var thisSchool = education.schools[s];
 			
@@ -218,42 +222,48 @@ var viewEducation = {
 
 var viewOnlineEd = {
 	HTMLonlineClasses : '<h3>Online Classes</h3>',
-	HTMLonlineTitle : '<a href="#">%data%',
+	name : '<a target="_blank" href="#">%data%',
 	//var HTMLonlineDegree = '<div class="degree-text">%data%</div>';
-	HTMLonlineDegree : ' - %data%</a>',
-	HTMLonlineDates : '<div class="date-text">%data%</div>',
-	HTMLonlineURL : '<a class="course-anchor" href="#">%data%</a>',
-	HTMLonlineCourseList : '<em><br>Courses:</em><ul id="onlineClass" class="flex-box" text-Align = "left"></ul>',
+	degree : ' - %data%</a>',
+	start : '<div class="education-entry"></div>',
+	dates : '<div class="date-text">%data%</div>',
+	courseURL : '<a class="course-anchor" target="_blank" href="#">%data%</a>',
+	courseList : '<em><br>Courses:</em><ul id="onlineClass" class="flex-box" text-Align = "left"></ul>',
 	
 	"render": function(){
 			var mySchools = octopus.getOnlineSchools();
-			if (mySchools.length===0){
-				return
+			if (mySchools.length===0 && document.getElementsByClassName('education-entry').length===0){
+				document.getElementById('education').style.display = 'none';
+				return;
 			}
 			
-			$("#education").append(HTMLonlineClasses);
+			$("#education").append(this.HTMLonlineClasses);
 		 
-		    for (var s in onlineEducation.schools){
-				var thisSchool = onlineEducation.schools[s];
-			
-			    var schoolTitle = HTMLonlineTitle.replace("%data%",thisSchool.school);
-			    schoolTitle = schoolTitle.replace("#",thisSchool.url)+
-			    HTMLonlineDegree.replace("%data%", thisSchool.degree);
-
-			    $("#education").append(HTMLschoolStart);
-			    $(".education-entry:last").append(schoolTitle);
-			    $(".education-entry:last").append(HTMLonlineDates.replace("%data%", thisSchool.dates));
-			
-			    $(".education-entry:last").append(HTMLonlineCourseList);
-			    for (var i=0;i<thisSchool.courses.length;++i){
-					var thisCourse = thisSchool.courses[i];
-				    var courseHTML = HTMLonlineURL.replace("%data%",thisCourse.title);
-				    courseHTML = courseHTML.replace("#",thisCourse.URL);
-				    $("#onlineClass").append(courseHTML);
-				
-			    }
+		    for (var s in mySchools){
+				this.renderSchool(mySchools[s]); 
 			}
-		}
+		},
+	"renderSchool": function(thisSchool){
+			
+		var schoolTitle = this.name.replace("%data%",thisSchool.school);
+		schoolTitle = schoolTitle.replace("#",thisSchool.url)+
+		this.degree.replace("%data%", thisSchool.degree);
+
+		$("#education").append(this.start);
+		$(".education-entry:last").append(schoolTitle);
+		$(".education-entry:last").append(this.dates.replace("%data%", thisSchool.dates));
+
+		if(thisSchool.courses.length > 0){
+			$(".education-entry:last").append(this.courseList);
+
+			for (var i=0;i<thisSchool.courses.length;++i){
+				var thisCourse = thisSchool.courses[i];
+				var courseHTML = this.courseURL.replace("%data%",thisCourse.title);
+				courseHTML = courseHTML.replace("#",thisCourse.URL);
+				$("#onlineClass").append(courseHTML);
+			}
+		}		
+	}
 };
 var octopus = {
 	getMainBio : function(){
