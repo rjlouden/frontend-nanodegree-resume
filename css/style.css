@@ -26,7 +26,8 @@ h6 {
 
 h1 {
   font-size: 40px;
-  color: #f5a623;
+ /* color: #f5a623;*/
+  color: #D8B0C8;
   line-height: 48px;
   display: inline;
 }
@@ -34,7 +35,8 @@ h1 {
 h2 {
   font-weight: bold;
   font-size: 24px;
-  color: #999;
+ /* color: #999;*/
+  color: #444E8C;
   line-height: 29px;
   padding: 10px;
 }
@@ -61,6 +63,9 @@ h5 {
 
 }
 
+.title {
+	color: #CCC3D2;
+}
 
 .date-text {
   font-style: italic;
@@ -106,16 +111,17 @@ a {
 }
 
 #skills-h3 {
-  color: #f5ae23;
+  color: #D8B0C8;
   display: none;
 }
 
 .orange {
-  background-color: #f5ae23;
+ /* background-color: #f5ae23;*/
+	background-color: #D8B0C8;
 }
 
 .orange-text {
-  color: #f5ae23;
+  color: #D8B0C8;
 }
 
 .white-text {
@@ -130,12 +136,13 @@ a {
 }
 
 .dark-gray {
-  background-color: #4a4a4a;
+  background-color: #27236B;
 }
 
 /* TODO: Replace with image later */
 #header {
-  background-color: #484848;
+  /*background-color: #27236B;*/
+  background-color: #444E8C;
 }
 
 .flex-box {
@@ -212,9 +219,27 @@ span {
   padding-bottom: 5%;
 }
 
+.left-col {
+    float: left;
+    width:35%;
+}
+.center-col {
+    float: right;
+    width: 35%;
+}
+.center-project {
+    margin-left: 20%;
+    margin-right: auto;
+}
+
 @media only screen and (min-width: 750px) {
   #skills-h3,
   .biopic {
     display: block;
   }
 }
+
+ accepted
+	
+
+

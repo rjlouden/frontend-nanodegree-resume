@@ -9,7 +9,7 @@ This is empty on purpose! Your code to build the resume will go here.
 		"mobile": "704-555-1212",
 		"email":"rjlouden@uncc.edu",
 		"github":"rjlouden",
-		"location":"New York, NY"
+		"location":"Charlotte, NC"
 	},
 	"bioPic":"./images/mountain-flowers-400x300.jpg",
 	"skills": ["ldap", "powershell", "python","file sharing"],
@@ -90,22 +90,72 @@ var work = {
 var projects = {
 	"project":[
 	{
-			title: "This Resume",
-			dates: "2016",
-			description: "Tool to Learn JavaScript"
+		title: "Attendance Checker",
+		dates: "2016",
+		description: "Tool to learn how to refactor code.",
+		photo: "images/attendance.png",
+		url: "../ud989-school-attendance/index.html"
+		
+	},
+	{
+		title: "Cat Clicker",
+		dates: "2016",
+		description: "Tool to Learn the Model Octopus View model of coding",
+		photo: "images/CatClicker.png",
+		url: "../cat-clicker/index.htm"
+	},
+	{
+		title: "This Resume",
+		dates: "2016",
+		description: "Tool to Learn JavaScript",
+		photo: "images/resume.png",
+		url: "./index.html"
 	}],
-	
+	columns: ["left-col","center-col"],
 	"display" : function(){
+		i=0;
+		numProjects=projects.project.length;
+		projectArray = [];
 		for(var proj in projects.project){
+			formattedPhoto="";
 			var thisProject = projects.project[proj];
-			
-			$("#projects").append(HTMLprojectStart);
+		//	if(i===0){$("#projects").append('<div class="row">')}
+			var start = HTMLprojectStart.replace("%data%",this.columns[i]);
 			var formattedHTMLprojectTitle = HTMLprojectTitle.replace("%data%",thisProject.title);
+			formattedHTMLprojectTitle = formattedHTMLprojectTitle.replace("#",thisProject.url);
 			var formattedHTMLprojectDates = HTMLprojectDates.replace("%data%",thisProject.dates);
 			var formattedHTMLprojectDescription= HTMLprojectDescription.replace("%data%",thisProject.description);
-	
-			$(".project-entry:last").append(formattedHTMLprojectTitle+formattedHTMLprojectDates+formattedHTMLprojectDescription);
+			if (thisProject.photo){
+				var formattedPhoto = HTMLprojectImage.replace("%data%",thisProject.photo);
+			}
+			projectArray.push(start+formattedHTMLprojectTitle+formattedHTMLprojectDates+formattedHTMLprojectDescription+formattedPhoto+'</div>');
+		//	$(".project-entry:last").append(formattedHTMLprojectTitle+formattedHTMLprojectDates+formattedHTMLprojectDescription+formattedPhoto);
+		//	if(i===1){$("#projects").append('</div>')}
+			++i;
+			if (i===2) {i=0;};
 		}
+		if (projectArray.length===1){
+			var myHTML = '<div class="row" style="display:flex">';
+			myHTML = myHTML+projectArray[0] +'</div>';
+			$("#projects").append(myHTML)
+		}
+		else{
+			for (i=0;i<projectArray.length%2;++i){
+				var myHTML = '<div class="row" style="display:flex">';
+				myHTML = myHTML+projectArray[i*2];
+				myHTML = myHTML +projectArray[i*2+1];
+				myHTML = myHTML+'</div>';
+				$("#projects").append(myHTML);
+			}
+			if (projectArray.length%2 ===1){
+				var myHTML = '<div class="row" style="display:flex">';
+				myHTML = myHTML+projectArray[projectArray.length-1] +'</div>';
+				myHTML = myHTML.replace("left-col","center-project");
+				console.log(myHTML);
+				$("#projects").append(myHTML)
+			}
+		}
+		
 	}
 };
 
