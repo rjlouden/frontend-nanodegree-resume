@@ -344,8 +344,6 @@ var viewMap = {
 		viewMap.pinPoster(locations);
 	},
 	pinPoster : function(locations){
-		
-		console.log(this.map);
 		var service = new google.maps.places.PlacesService(this.map);
 		
 		locations.forEach(function(place){
@@ -368,6 +366,14 @@ var viewMap = {
 			title: name
 		});
 		
+		var infoWindow = new google.maps.InfoWindow({
+			content: name
+		});
+		
+		google.maps.event.addListener(marker, 'click', function(){
+			infoWindow.open(this.map, marker);
+		});
+		
 		bounds.extend(new google.maps.LatLng(lat, lon));
 		this.map.fitBounds(bounds);
 		this.map.setCenter(bounds.getCenter());
@@ -378,15 +384,7 @@ var viewMap = {
 		}
 	}
 
-    /*// infoWindows are the little helper windows that open when you click
-    // or hover over a pin on a map. They usually contain more information
-    // about a location.
-    var infoWindow = new google.maps.InfoWindow({
-      content: name
-    });
-
-    google.maps.event.addListener(marker, 'click', function() {
-			
+/*			
 //	map.setCenter(marker.getPosition());
 //	map.setZoom(8.0);
     if (overlayMaps[name] == undefined) {
@@ -403,7 +401,6 @@ var viewMap = {
 		}
 	}
     
-	infoWindow.open(map, marker)
     });
 	*/
 
