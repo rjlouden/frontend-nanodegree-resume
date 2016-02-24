@@ -37,6 +37,32 @@ var work = {
 	]
 };
 
+var projects = {
+	"project":[
+	{
+		title: "Attendance Checker",
+		dates: "2016",
+		description: "Tool to learn how to refactor code.",
+		photo: "images/attendance.png",
+		url: "../ud989-school-attendance/index.html"
+		
+	},
+	{
+		title: "Cat Clicker",
+		dates: "2016",
+		description: "Tool to Learn the Model Octopus View model of coding",
+		photo: "images/CatClicker.png",
+		url: "../cat-clicker/index.htm"
+	},
+	{
+		title: "This Resume",
+		dates: "2016",
+		description: "Tool to Learn JavaScript",
+		photo: "images/resume.png",
+		url: "./index.html"
+	}],
+};
+
 var education = {
 	"schools":[
 		{
@@ -84,35 +110,7 @@ var onlineEducation = {
 				"title":"Programming Languages"
 			}]
 		}
-	],
-	"display": function(){
-			if (onlineEducation.schools.length==0){
-				return
-			}
-			
-			$("#education").append(HTMLonlineClasses);
-		 
-		    for (var s in onlineEducation.schools){
-				var thisSchool = onlineEducation.schools[s];
-			
-			    var schoolTitle = HTMLonlineTitle.replace("%data%",thisSchool.school);
-			    schoolTitle = schoolTitle.replace("#",thisSchool.url)+
-			    HTMLonlineDegree.replace("%data%", thisSchool.degree);
-
-			    $("#education").append(HTMLschoolStart);
-			    $(".education-entry:last").append(schoolTitle);
-			    $(".education-entry:last").append(HTMLonlineDates.replace("%data%", thisSchool.dates));
-			
-			    $(".education-entry:last").append(HTMLonlineCourseList);
-			    for (var i=0;i<thisSchool.courses.length;++i){
-					var thisCourse = thisSchool.courses[i];
-				    var courseHTML = HTMLonlineURL.replace("%data%",thisCourse.title);
-				    courseHTML = courseHTML.replace("#",thisCourse.URL);
-				    $("#onlineClass").append(courseHTML);
-				
-			    }
-			}
-		}
+	]
 };
 
 var viewBio = {
@@ -153,11 +151,6 @@ var viewBio = {
 	renderContacts: function(div){
 		var myContacts = octopus.getContacts();
 		
-		var formattedHTMLmobile = HTMLmobile.replace("%data%",bio.contacts.mobile);
-		var formattedEmail = HTMLemail.replace("%data%",bio.contacts.email);
-		var formattedHTMLgithub = HTMLgithub.replace("%data%",bio.contacts.github)
-		var formattedHTMLlocation = HTMLlocation.replace("%data%",bio.contacts.location);
- 
 		$(div).append(this.mobile.replace("%data%",bio.contacts.mobile));
 		$(div).append(this.email.replace("%data%",bio.contacts.email));
 		$(div).append(this.github.replace("%data%",bio.contacts.github));
@@ -191,6 +184,55 @@ var viewWork ={
 	        $(".work-entry:last").append(this.location.replace("%data%",myJobs[job].location));
 	        $(".work-entry:last").append(this.description.replace("%data%",myJobs[job].description));
 		}
+	}
+};
+
+var viewProjects = {
+	start : '<div class="project-entry">',
+	title : '<a href="#">%data%</a>',
+	dates : '<div class="date-text">%data%</div>',
+	description : '<p><br>%data%</p>',
+	image : '<img src="%data%">',
+	row : '<div class="row" style="display:flex">',
+
+	"render" : function(){
+		var myProjects = octopus.getProjects();
+		
+		if (myProjects.length===0){
+			document.getElementById('projects').style.display = 'none';
+			return;
+		}
+		var projectArray = [];
+		for(var proj in myProjects){
+			projectArray.push(this.buildProjectEntry(myProjects[proj]));		
+		}
+		if (projectArray.length===1){
+			$("#projects").append(this.row+projectArray[0] +'</div>')
+		}
+		else{
+			for (i=0;i<projectArray.length%2;++i){
+				$("#projects").append(this.row+projectArray[i*2]+projectArray[i*2+1]+'</div>');
+			}
+			if (projectArray.length%2 ===1){
+				var myHTML = '<div class="row" style="display:flex">';
+				$("#projects").append(this.row+projectArray[projectArray.length-1] +'</div>')
+			}
+		}
+		
+	},
+	"buildProjectEntry": function(thisProject){
+		var title = this.title.replace("%data%",thisProject.title);
+		title = title.replace("#",thisProject.url);
+			
+		var dates = this.dates.replace("%data%",thisProject.dates);
+		var description= this.description.replace("%data%",thisProject.description);
+			
+		formattedPhoto="";
+		if (thisProject.photo){
+			var formattedPhoto = this.image.replace("%data%",thisProject.photo);
+		}
+			
+		return(this.start+title+dates+description+formattedPhoto+'</div>');
 	}
 };
 
@@ -265,6 +307,108 @@ var viewOnlineEd = {
 		}		
 	}
 };
+
+//locationOverlay.prototype = new google.maps.OverlayView();
+
+var map = {
+	overlayMaps : [],
+	locationImages: {
+		"Greensboro, NC, USA" : "./images/Greensboro.jpg",
+		"Charlotte, NC, USA" : "./images/Charlotte_Skyline_Night_970x550.jpg",
+		"New York, NY, USA" : "./images/statue.jpg"
+	}
+};
+
+var viewMap = {
+	googleMap : '<div id="map"></div>',
+	render: function(){
+		$("#mapDiv").append(this.googleMap);
+		
+		window.mapBounds = new google.maps.LatLngBounds();
+		
+		window.addEventListener('load', this.initializeMap);
+
+		window.addEventListener('resize', function(e) {
+			map.fitBounds(mapBounds);
+		});
+	},
+	initializeMap: function() {
+		var mapOptions = {
+			disableDefaultUI: true
+		//	mapTypeId: google.maps.MapTypeId.SATELLITE,
+		//	center: new google.maps.LatLng(40.743388, -74.007592),
+		};
+		viewMap.map = new google.maps.Map(document.querySelector('#map'), mapOptions);
+		
+		var locations = octopus.getLocations();
+		viewMap.pinPoster(locations);
+	},
+	pinPoster : function(locations){
+		
+		console.log(this.map);
+		var service = new google.maps.places.PlacesService(this.map);
+		
+		locations.forEach(function(place){
+			// the search request object
+			var request = {
+				query: place
+			};
+			service.textSearch(request, viewMap.callback);
+		});
+	},
+	createMapMarker: function(placeData){
+		var lat = placeData.geometry.location.lat();  
+		var lon = placeData.geometry.location.lng();  
+		var name = placeData.formatted_address;   
+		var bounds = window.mapBounds;            
+
+		var marker = new google.maps.Marker({
+			map: this.map,
+			position: placeData.geometry.location,
+			title: name
+		});
+		
+		bounds.extend(new google.maps.LatLng(lat, lon));
+		this.map.fitBounds(bounds);
+		this.map.setCenter(bounds.getCenter());
+	},
+	callback: function (results, status) {
+		if (status == google.maps.places.PlacesServiceStatus.OK) {
+			viewMap.createMapMarker(results[0]);
+		}
+	}
+
+    /*// infoWindows are the little helper windows that open when you click
+    // or hover over a pin on a map. They usually contain more information
+    // about a location.
+    var infoWindow = new google.maps.InfoWindow({
+      content: name
+    });
+
+    google.maps.event.addListener(marker, 'click', function() {
+			
+//	map.setCenter(marker.getPosition());
+//	map.setZoom(8.0);
+    if (overlayMaps[name] == undefined) {
+		if (locationImages[name]!= undefined){
+			overlayMaps[name] = new locationOverlay(bounds, locationImages[name], map);
+		}
+	}
+	for (var loc in overlayMaps){
+		if (loc !== name ) {
+			overlayMaps[loc].div_.style.visibility = 'hidden';
+		}
+		else if (overlayMaps[name] != undefined && overlayMaps[loc].div_ !== null) {
+			overlayMaps[loc].div_.style.visibility = 'visible';
+		}
+	}
+    
+	infoWindow.open(map, marker)
+    });
+	*/
+
+}
+
 var octopus = {
 	getMainBio : function(){
 		return ({
@@ -283,99 +427,52 @@ var octopus = {
 	getJobs: function(){
 		return(work.jobs);
 	},
+	getProjects: function(){
+		return(projects.project);
+	},
 	getSchools: function(){
 		return(education.schools);
 	},
 	getOnlineSchools: function(){
 		return(onlineEducation.schools);
+	},
+	getLocations: function(){
+		var locations = [];
+		locations.push(bio.contacts.location);
+
+		education.schools.forEach(function(school){
+			if (locations.indexOf(school.location)===-1){
+				locations.push(school.location);
+			}
+		});
+
+		work.jobs.forEach(function(job){
+			if (locations.indexOf(job.location)===-1){
+				locations.push(job.location);
+			}
+		});
+
+		return locations;
+	},
+	init : function(){
+		viewBio.render();
+		viewWork.render();
+		viewProjects.render();
+		viewEducation.render();
+		viewOnlineEd.render();
+		viewMap.render();
+		viewBio.renderContacts("#footerContacts");
 	}
 }
 			
-var projects = {
-	"project":[
-	{
-		title: "Attendance Checker",
-		dates: "2016",
-		description: "Tool to learn how to refactor code.",
-		photo: "images/attendance.png",
-		url: "../ud989-school-attendance/index.html"
-		
-	},
-	{
-		title: "Cat Clicker",
-		dates: "2016",
-		description: "Tool to Learn the Model Octopus View model of coding",
-		photo: "images/CatClicker.png",
-		url: "../cat-clicker/index.htm"
-	},
-	{
-		title: "This Resume",
-		dates: "2016",
-		description: "Tool to Learn JavaScript",
-		photo: "images/resume.png",
-		url: "./index.html"
-	}],
-	columns: ["left-col","center-col"],
-	"display" : function(){
-		i=0;
-		numProjects=projects.project.length;
-		projectArray = [];
-		for(var proj in projects.project){
-			formattedPhoto="";
-			var thisProject = projects.project[proj];
-		//	if(i===0){$("#projects").append('<div class="row">')}
-			var start = HTMLprojectStart.replace("%data%",this.columns[i]);
-			var formattedHTMLprojectTitle = HTMLprojectTitle.replace("%data%",thisProject.title);
-			formattedHTMLprojectTitle = formattedHTMLprojectTitle.replace("#",thisProject.url);
-			var formattedHTMLprojectDates = HTMLprojectDates.replace("%data%",thisProject.dates);
-			var formattedHTMLprojectDescription= HTMLprojectDescription.replace("%data%",thisProject.description);
-			if (thisProject.photo){
-				var formattedPhoto = HTMLprojectImage.replace("%data%",thisProject.photo);
-			}
-			projectArray.push(start+formattedHTMLprojectTitle+formattedHTMLprojectDates+formattedHTMLprojectDescription+formattedPhoto+'</div>');
-		//	$(".project-entry:last").append(formattedHTMLprojectTitle+formattedHTMLprojectDates+formattedHTMLprojectDescription+formattedPhoto);
-		//	if(i===1){$("#projects").append('</div>')}
-			++i;
-			if (i===2) {i=0;};
-		}
-		if (projectArray.length===1){
-			var myHTML = '<div class="row" style="display:flex">';
-			myHTML = myHTML+projectArray[0] +'</div>';
-			$("#projects").append(myHTML)
-		}
-		else{
-			for (i=0;i<projectArray.length%2;++i){
-				var myHTML = '<div class="row" style="display:flex">';
-				myHTML = myHTML+projectArray[i*2];
-				myHTML = myHTML +projectArray[i*2+1];
-				myHTML = myHTML+'</div>';
-				$("#projects").append(myHTML);
-			}
-			if (projectArray.length%2 ===1){
-				var myHTML = '<div class="row" style="display:flex">';
-				myHTML = myHTML+projectArray[projectArray.length-1] +'</div>';
-				myHTML = myHTML.replace("left-col","center-project");
-				console.log(myHTML);
-				$("#projects").append(myHTML)
-			}
-		}
-		
-	}
-};
-
 var locationImages = [];
 locationImages["Greensboro, NC, USA"]="./images/Greensboro.jpg";
 locationImages["Charlotte, NC, USA"]="./images/Charlotte_Skyline_Night_970x550.jpg";
 locationImages["New York, NY, USA"]="./images/statue.jpg";
  
-viewBio.render();
-viewWork.render();
-projects.display();
-viewEducation.render();
-viewOnlineEd.render();
+octopus.init();
 
-$("#mapDiv").append(googleMap);
-viewBio.renderContacts("#footerContacts");
+
 
 
  
