@@ -1,7 +1,3 @@
-/*
-This is empty on purpose! Your code to build the resume will go here.
- */
- 
  var bio = {
 	 "name": "Rachel Louden", 
 	 "role":"Application Administrator",
@@ -144,10 +140,10 @@ var viewBio = {
 			}
 		}
 	},
-	mobile : '<li class="flex-item"><span class="orange-text">mobile</span><span class="white-text">%data%</span></li>',
-	email : '<li class="flex-item"><span class="orange-text">email</span><span class="white-text">%data%</span></li>',
-	github : '<li class="flex-item"><span class="orange-text">github</span><span class="white-text">%data%</span></li>',
-	location : '<li class="flex-item"><span class="orange-text">location</span><span class="white-text">%data%</span></li>',
+	mobile : '<li class="flex-item"><span class="lavendar-text">mobile</span><span class="white-text">%data%</span></li>',
+	email : '<li class="flex-item"><span class="lavendar-text">email</span><span class="white-text">%data%</span></li>',
+	github : '<li class="flex-item"><span class="lavendar-text">github</span><span class="white-text">%data%</span></li>',
+	location : '<li class="flex-item"><span class="lavendar-text">location</span><span class="white-text">%data%</span></li>',
 	renderContacts: function(div){
 		var myContacts = octopus.getContacts();
 		
@@ -193,13 +189,12 @@ var viewProjects = {
 	dates : '<div class="date-text">%data%</div>',
 	description : '<p><br>%data%</p>',
 	image : '<img src="%data%">',
-	row : '<div class="row" style="display:flex">',
+	row : '<div class="row flex-row">',
 
 	"render" : function(){
 		var myProjects = octopus.getProjects();
-		
 		if (myProjects.length===0){
-			document.getElementById('projects').style.display = 'none';
+			document.getElementById('project-section').style.display = 'none';
 			return;
 		}
 		var projectArray = [];
@@ -308,19 +303,14 @@ var viewOnlineEd = {
 	}
 };
 
-//locationOverlay.prototype = new google.maps.OverlayView();
-
-var map = {
-	overlayMaps : [],
+var viewMap = {
+	googleMap : '<div id="map"></div>',
 	locationImages: {
 		"Greensboro, NC, USA" : "./images/Greensboro.jpg",
 		"Charlotte, NC, USA" : "./images/Charlotte_Skyline_Night_970x550.jpg",
 		"New York, NY, USA" : "./images/statue.jpg"
-	}
-};
-
-var viewMap = {
-	googleMap : '<div id="map"></div>',
+	},
+	overlayMaps : [],
 	render: function(){
 		$("#mapDiv").append(this.googleMap);
 		
@@ -329,7 +319,7 @@ var viewMap = {
 		window.addEventListener('load', this.initializeMap);
 
 		window.addEventListener('resize', function(e) {
-			map.fitBounds(mapBounds);
+			viewMap.map.fitBounds(mapBounds);
 		});
 	},
 	initializeMap: function() {
@@ -371,7 +361,10 @@ var viewMap = {
 		});
 		
 		google.maps.event.addListener(marker, 'click', function(){
-			infoWindow.open(this.map, marker);
+			//infoWindow.open(this.map, marker);
+			//his.map.setCenter(marker.getPosition());
+			//this.map.setZoom(8.0);
+			viewMap.updateOverlays(name, bounds);
 		});
 		
 		bounds.extend(new google.maps.LatLng(lat, lon));
@@ -382,29 +375,75 @@ var viewMap = {
 		if (status == google.maps.places.PlacesServiceStatus.OK) {
 			viewMap.createMapMarker(results[0]);
 		}
-	}
-
-/*			
-//	map.setCenter(marker.getPosition());
-//	map.setZoom(8.0);
-    if (overlayMaps[name] == undefined) {
-		if (locationImages[name]!= undefined){
-			overlayMaps[name] = new locationOverlay(bounds, locationImages[name], map);
+	},
+	updateOverlays : function(name, bounds){
+		if (this.overlayMaps[name] == undefined) {
+			if (this.locationImages[name]!= undefined){
+				this.overlayMaps[name] = new locationOverlay(bounds, this.locationImages[name], this.map);
+			}
+		}
+			
+		for (var loc in this.overlayMaps){
+			if (loc !== name ) {
+				this.overlayMaps[loc].div_.style.visibility = 'hidden';
+			}
+			else if (this.overlayMaps[name] != undefined && this.overlayMaps[loc].div_ !== null) {
+				this.overlayMaps[loc].div_.style.visibility = 'visible';
+			}
 		}
 	}
-	for (var loc in overlayMaps){
-		if (loc !== name ) {
-			overlayMaps[loc].div_.style.visibility = 'hidden';
-		}
-		else if (overlayMaps[name] != undefined && overlayMaps[loc].div_ !== null) {
-			overlayMaps[loc].div_.style.visibility = 'visible';
-		}
-	}
-    
-    });
-	*/
-
 }
+
+locationOverlay.prototype = new google.maps.OverlayView();
+
+function locationOverlay(bounds, image, map) {
+        this.bounds_ = bounds;
+        this.image_ = image;
+        this.map_ = map;
+        this.div_ = null;
+        this.setMap(map);
+    }
+
+locationOverlay.prototype.onAdd = function () {
+	var div = document.createElement('div');
+    div.style.borderStyle = 'none';
+    div.style.borderWidth = '0px';
+    div.style.position = 'absolute';
+
+    var img = document.createElement('img');
+    img.src = this.image_;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.opacity = '0.5';
+    img.style.position = 'absolute';
+    div.appendChild(img);
+    this.div_ = div;
+
+    var panes = this.getPanes();
+    panes.overlayLayer.appendChild(div);
+};
+
+locationOverlay.prototype.draw = function () {
+	var overlayProjection = this.getProjection();
+    var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+    var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+    var div = this.div_;
+
+    div.style.left = sw.x + 'px';
+    div.style.top = ne.y + 'px';
+    div.style.width = (ne.x - sw.x) + 'px';
+    div.style.height = (sw.y - ne.y) + 'px';
+};
+
+locationOverlay.prototype.updateBounds = function (bounds) {
+        this.bounds_ = bounds;
+        this.draw();
+    };
+
+locationOverlay.prototype.onRemove = function () {
+	this.div_.parentNode.removeChild(this.div_);
+    this.div_ = null;
+};
 
 var octopus = {
 	getMainBio : function(){
@@ -461,12 +500,7 @@ var octopus = {
 		viewBio.renderContacts("#footerContacts");
 	}
 }
-			
-var locationImages = [];
-locationImages["Greensboro, NC, USA"]="./images/Greensboro.jpg";
-locationImages["Charlotte, NC, USA"]="./images/Charlotte_Skyline_Night_970x550.jpg";
-locationImages["New York, NY, USA"]="./images/statue.jpg";
- 
+			 
 octopus.init();
 
 

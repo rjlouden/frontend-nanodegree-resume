@@ -121,12 +121,11 @@ a {
   display: none;
 }
 
-.orange {
- /* background-color: #f5ae23;*/
+.lavendar {
 	background-color: #D8B0C8;
 }
 
-.orange-text {
+.lavendar-text {
   color: #D8B0C8;
 }
 
@@ -145,9 +144,7 @@ a {
   background-color: #27236B;
 }
 
-/* TODO: Replace with image later */
 #header {
-  /*background-color: #27236B;*/
   background-color: #444E8C;
 }
 
@@ -224,18 +221,8 @@ span {
   width: 100%;
   padding-bottom: 5%;
 }
-
-.left-col {
-    float: left;
-    width:35%;
-}
-.center-col {
-    float: right;
-    width: 35%;
-}
-.center-project {
-    margin-left: 20%;
-    margin-right: auto;
+.flex-row {
+    display: flex;
 }
 
 @media only screen and (min-width: 750px) {
