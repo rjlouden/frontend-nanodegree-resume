@@ -48,7 +48,7 @@ var projects = {
 		dates: "2016",
 		description: "Tool to Learn the Model Octopus View model of coding",
 		photo: "images/CatClicker.png",
-		url: "../cat-clicker/index.htm"
+		url: "../cat-clicker-ko/index.htm"
 	},
 	{
 		title: "This Resume",
